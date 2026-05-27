@@ -122,7 +122,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .modal-title{font-size:16px;font-weight:600}
 .modal-sub{font-size:12px;color:var(--muted);margin-top:2px}
 .topping-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:16px}
-.topp-btn{display:flex;align-items:center;gap:8px;padding:10px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;text-align:left;transition:all 0.15s;width:100%}
+.topp-btn{display:flex;align-items:center;gap:8px;padding:10px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;text-align:left;transition:all 0.15s;width:100%;flex-wrap:nowrap}
 .topp-btn.on{background:var(--accent-dim);border-color:var(--accent-border)}
 .topp-btn.on .tn{color:var(--accent)}
 .topp-icon{font-size:18px;flex-shrink:0}
@@ -197,7 +197,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
     </div>
  
     <div class="notes" style="margin-bottom:16px">
-      <textarea id="notesField" rows="2" placeholder="📝 Notas del día — doble entreno, cena fuera, pre-fondo..."></textarea>
+      <textarea id="notesField" rows="2" placeholder="📝 Notas del día — doble entreno, cena fuera, pre-fondo..." oninput="saveDay()"></textarea>
     </div>
   </div>
  
@@ -341,31 +341,30 @@ const SALAD_TOPPINGS=[
 ];
  
 const FOODS=[
-  {name:'Batido Pajarito base',          icon:'🫐',prot:10,carb:28,gras:2, kcal:185,toppings:'batido',note:'Yogurt Pajarito + sin proteína en polvo'},
-  {name:'Batido Pajarito + proteína',    icon:'💪',prot:35,carb:32,gras:3, kcal:305,toppings:'batido',note:'Con 1 scoop proteína incluido'},
+  {name:'Batido Pajarito base',          icon:'🫐',prot:10,carb:28,gras:2, kcal:185,toppings:'batido'},
+  {name:'Batido Pajarito + proteína',    icon:'💪',prot:35,carb:32,gras:3, kcal:305,toppings:'batido'},
   {name:'Ensalada pollo',                icon:'🥗',prot:33,carb:10,gras:10,kcal:270,toppings:'salad'},
   {name:'Ensalada carne molida',         icon:'🥗',prot:28,carb:10,gras:16,kcal:300,toppings:'salad'},
-  {name:'2 huevos',                      icon:'🥚',prot:12,carb:0, gras:10,kcal:140},
-  {name:'3 huevos',                      icon:'🥚',prot:18,carb:0, gras:15,kcal:210},
+  {name:'Huevo',                         icon:'🥚',prot:6, carb:0, gras:5, kcal:70, unit:'unidades',defaultQty:2},
   {name:'Pechuga pollo 150g',            icon:'🍗',prot:40,carb:0, gras:4, kcal:190},
   {name:'Carne molida 120g',             icon:'🥩',prot:26,carb:0, gras:14,kcal:235},
   {name:'Filete de carne 150g',          icon:'🥩',prot:35,carb:0, gras:10,kcal:235},
   {name:'Salmón 150g',                   icon:'🐟',prot:34,carb:0, gras:12,kcal:220},
-  {name:'Atún al agua 1 lata',           icon:'🐟',prot:26,carb:0, gras:1, kcal:120},
+  {name:'Atún al agua',                  icon:'🐟',prot:26,carb:0, gras:1, kcal:120,unit:'latas',defaultQty:1},
   {name:'Hallulla + palta + 2 huevos',   icon:'🥑',prot:14,carb:30,gras:18,kcal:320},
   {name:'Yogurt Pajarito batido',        icon:'🥛',prot:18,carb:25,gras:4, kcal:210},
   {name:'Yogurt Quillayes Protein',      icon:'🫙',prot:15,carb:12,gras:2, kcal:130},
   {name:'Proteína en polvo 1 scoop',     icon:'🧃',prot:25,carb:4, gras:1, kcal:120},
   {name:'Leche + proteína 1 scoop',      icon:'🥤',prot:31,carb:16,gras:3, kcal:220},
-  {name:'Jamón serrano 1 lámina',        icon:'🥩',prot:3, carb:0, gras:2, kcal:24},
+  {name:'Jamón serrano',                 icon:'🥩',prot:3, carb:0, gras:2, kcal:24, unit:'láminas',defaultQty:1},
   {name:'Charqui 15g',                   icon:'🥓',prot:8, carb:0, gras:1, kcal:45},
-  {name:'Barra de proteína',             icon:'🍫',prot:20,carb:22,gras:6, kcal:210},
-  {name:'Media barra proteína',          icon:'🍫',prot:10,carb:11,gras:3, kcal:105},
+  {name:'Barra de proteína',             icon:'🍫',prot:20,carb:22,gras:6, kcal:210,unit:'barras',defaultQty:1},
+  {name:'Media barra proteína',          icon:'🍫',prot:10,carb:11,gras:3, kcal:105,unit:'barras',defaultQty:1},
   {name:'Porotos granados (plato)',      icon:'🫘',prot:10,carb:45,gras:5, kcal:220},
   {name:'Avena 50g',                     icon:'🌾',prot:7, carb:30,gras:3, kcal:180},
-  {name:'Plátano',                       icon:'🍌',prot:1, carb:27,gras:0, kcal:105},
-  {name:'Dátiles 3 unidades',            icon:'🫐',prot:1, carb:18,gras:0, kcal:70},
-  {name:'Galleta arroz + maní',          icon:'🍘',prot:4, carb:22,gras:5, kcal:140},
+  {name:'Plátano',                       icon:'🍌',prot:1, carb:27,gras:0, kcal:105,unit:'unidades',defaultQty:1},
+  {name:'Dátil',                         icon:'🫐',prot:0, carb:6, gras:0, kcal:23, unit:'unidades',defaultQty:3},
+  {name:'Galleta arroz + maní',          icon:'🍘',prot:4, carb:22,gras:5, kcal:140,unit:'unidades',defaultQty:1},
   {name:'Requesón 100g',                 icon:'🧀',prot:12,carb:3, gras:4, kcal:90},
   {name:'Arroz cocido 150g',             icon:'🍚',prot:3, carb:40,gras:0, kcal:175},
   {name:'Pasta cocida 200g',             icon:'🍝',prot:8, carb:55,gras:1, kcal:265},
@@ -375,15 +374,36 @@ const FOODS=[
 let foods=[], sport=null, carbLoad=false;
 let modalFoodIdx=null, modalQty=1, selectedToppings=new Set(), toppingQtys={};
  
+function saveDay(){
+  const d=new Date().toISOString().slice(0,10);
+  localStorage.setItem('day_data', JSON.stringify({date:d, foods, sport, carbLoad, notes:document.getElementById('notesField').value}));
+}
+ 
+function loadDay(){
+  const saved=localStorage.getItem('day_data');
+  if(!saved) return;
+  const data=JSON.parse(saved);
+  const today=new Date().toISOString().slice(0,10);
+  if(data.date!==today){ localStorage.removeItem('day_data'); return; }
+  foods=data.foods||[];
+  carbLoad=data.carbLoad||false;
+  if(carbLoad){ document.getElementById('carbBtn').classList.add('on'); document.getElementById('carbBanner').classList.add('show'); }
+  if(data.notes) document.getElementById('notesField').value=data.notes;
+  if(data.sport) selectSport(data.sport);
+}
+ 
 function init(){
   const d=new Date();
   document.getElementById('hdrDate').textContent=d.toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long'});
   const sr=document.getElementById('sportRow');
   sr.innerHTML=SPORTS.map(s=>`<div class="chip" id="chip-${s.id}" onclick="selectSport('${s.id}')">${s.label}</div>`).join('');
-  const dow=d.getDay();
-  const auto={1:'pilates',2:'swim',3:'run',4:'gym',5:'tempo',6:'rest',0:'fondo'};
-  if(auto[dow]) selectSport(auto[dow]);
   renderQuickGrid(FOODS);
+  loadDay();
+  if(!sport){
+    const dow=d.getDay();
+    const auto={1:'pilates',2:'swim',3:'run',4:'gym',5:'tempo',6:'rest',0:'fondo'};
+    if(auto[dow]) selectSport(auto[dow]);
+  }
   render();
 }
  
@@ -446,10 +466,12 @@ function filterFoods(q){
 }
  
 function openModal(idx){
-  modalFoodIdx=idx; modalQty=1; selectedToppings=new Set(); toppingQtys={};
+  modalFoodIdx=idx; selectedToppings=new Set(); toppingQtys={};
   const f=FOODS[idx];
+  modalQty=f.defaultQty||1;
+ 
   document.getElementById('modalTitle').textContent=f.icon+' '+f.name;
-  document.getElementById('modalSub').textContent=`${f.prot}g prot · ${f.carb}g carbs · ${f.kcal} kcal base`;
+  document.getElementById('modalSub').textContent=`${f.prot}g prot · ${f.carb}g carbs · ${f.kcal} kcal por unidad`;
  
   const qs=document.getElementById('qtySection');
   const ts=document.getElementById('toppingSection');
@@ -458,27 +480,30 @@ function openModal(idx){
     qs.style.display='none';
     ts.style.display='block';
     const tList=f.toppings==='batido'?BATIDO_TOPPINGS:SALAD_TOPPINGS;
+    // Set default qtys for countable toppings
+    tList.forEach((t,i)=>{ if(t.unit) toppingQtys[i]=t.defaultQty||1; });
     document.getElementById('toppingGrid').innerHTML=tList.map((t,i)=>`
-      <button class="topp-btn" id="topp-${i}" onclick="toggleTopping(${i},'${f.toppings}')">
+      <button class="topp-btn" id="topp-${i}" onclick="toggleTopping(${i})">
         <span class="topp-icon">${t.icon}</span>
-        <div>
+        <div style="flex:1;min-width:0">
           <div class="tn">${t.name}</div>
           <div class="tm">${t.prot}g prot · ${t.carb}g carbs · ${t.kcal} kcal</div>
-          ${t.unit?`<div class="qty-row" style="margin-top:6px" onclick="event.stopPropagation()">
-            <button class="qty-btn" style="width:26px;height:26px;font-size:14px" onclick="changeToppingQty(${i},-1,'${f.toppings}')">−</button>
-            <span class="qty-val" style="font-size:13px" id="tqv-${i}">${t.defaultQty||1}</span>
-            <span style="font-size:11px;color:var(--muted)">${t.unit}</span>
-            <button class="qty-btn" style="width:26px;height:26px;font-size:14px" onclick="changeToppingQty(${i},1,'${f.toppings}')">+</button>
-          </div>`:''}
         </div>
+        ${t.unit?`<div style="display:flex;align-items:center;gap:6px;flex-shrink:0" onclick="event.stopPropagation()">
+          <button class="qty-btn" style="width:26px;height:26px;font-size:16px" onclick="changeToppingQty(${i},-1)">−</button>
+          <span style="font-size:13px;font-weight:600;min-width:16px;text-align:center" id="tqv-${i}">${t.defaultQty||1}</span>
+          <button class="qty-btn" style="width:26px;height:26px;font-size:16px" onclick="changeToppingQty(${i},1)">+</button>
+        </div>`:''}
       </button>`).join('');
-    // Set default qtys
-    tList.forEach((t,i)=>{ if(t.defaultQty) toppingQtys[i]=t.defaultQty; });
-  } else {
+  } else if(f.unit){
     qs.style.display='block';
     ts.style.display='none';
-    document.getElementById('qtyLbl').textContent='porción';
+    document.getElementById('qtyLbl').textContent=f.unit;
+    document.getElementById('qtyVal').textContent=modalQty;
     updateQtyPreview();
+  } else {
+    qs.style.display='none';
+    ts.style.display='none';
   }
  
   document.getElementById('modal').style.display='flex';
@@ -497,14 +522,15 @@ function changeQty(d){
   updateQtyPreview();
 }
  
-function toggleTopping(i, type){
+function toggleTopping(i){
   const btn=document.getElementById('topp-'+i);
   if(selectedToppings.has(i)){ selectedToppings.delete(i); btn.classList.remove('on'); }
   else { selectedToppings.add(i); btn.classList.add('on'); }
 }
  
-function changeToppingQty(i, d, type){
-  const tList=type==='batido'?BATIDO_TOPPINGS:SALAD_TOPPINGS;
+function changeToppingQty(i, d){
+  const f=FOODS[modalFoodIdx];
+  const tList=f.toppings==='batido'?BATIDO_TOPPINGS:SALAD_TOPPINGS;
   const t=tList[i];
   if(!t.unit) return;
   toppingQtys[i]=Math.max(1,(toppingQtys[i]||t.defaultQty||1)+d);
@@ -515,12 +541,10 @@ function confirmModal(){
   if(modalFoodIdx===null) return;
   const f=FOODS[modalFoodIdx];
   const entry={...f};
-  entry.prot=Math.round(f.prot*modalQty);
-  entry.carb=Math.round(f.carb*modalQty);
-  entry.gras=Math.round((f.gras||0)*modalQty);
-  entry.kcal=Math.round(f.kcal*modalQty);
  
   if(f.toppings){
+    // Base macros as-is (already per serving)
+    entry.prot=f.prot; entry.carb=f.carb; entry.gras=f.gras||0; entry.kcal=f.kcal;
     const tList=f.toppings==='batido'?BATIDO_TOPPINGS:SALAD_TOPPINGS;
     let extras=[];
     selectedToppings.forEach(i=>{
@@ -535,11 +559,18 @@ function confirmModal(){
     });
     if(extras.length) entry.name+=` + ${extras.join(', ')}`;
     delete entry.toppings;
-  } else if(modalQty>1){
-    entry.name=`${f.name} ×${modalQty}`;
+  } else if(f.unit){
+    // Countable item — multiply by qty
+    entry.prot=Math.round(f.prot*modalQty);
+    entry.carb=Math.round(f.carb*modalQty);
+    entry.gras=Math.round((f.gras||0)*modalQty);
+    entry.kcal=Math.round(f.kcal*modalQty);
+    entry.name=`${f.name} ×${modalQty} ${f.unit}`;
   }
+  // Non-countable, non-topping: add as-is
  
   foods.push(entry);
+  saveDay();
   closeModal();
   render();
   showScreen('scr-main');
@@ -558,11 +589,11 @@ function addManual(){
   if(!name) return;
   foods.push({name,icon:'🍽️',prot,carb,gras,kcal});
   ['mName','mProt','mCarb','mKcal','mGras'].forEach(id=>document.getElementById(id).value='');
-  render();
+  saveDay(); render();
   showScreen('scr-main');
 }
  
-function removeFood(i){ foods.splice(i,1); render(); }
+function removeFood(i){ foods.splice(i,1); saveDay(); render(); }
  
 function render(){
   const tot=foods.reduce((a,f)=>({prot:a.prot+f.prot,carb:a.carb+f.carb,gras:a.gras+(f.gras||0),kcal:a.kcal+f.kcal}),{prot:0,carb:0,gras:0,kcal:0});
